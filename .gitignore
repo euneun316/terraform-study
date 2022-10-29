@@ -58,3 +58,8 @@ comment.md
 .DS_Store
 .AppleDouble
 .LSOverride
+
+### image file ###
+
+*/image/
+*image
