@@ -85,7 +85,7 @@ Switched to workspace "imokwork1".
   
 - 리소스에 전달해야 되는 매개변수 중 패드워드 처럼 민감정보는 코드에 직접 평문 입력을 하는 대신 전달 할 수 있는 방안
 
-```json
+```bash
 variable "db_username" {
   description = "The username for the database"
   type        = string
