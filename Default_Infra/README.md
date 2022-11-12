@@ -47,4 +47,4 @@
     
 
 ## 구축 예상 아키텍처
-<img src="https://user-images.githubusercontent.com/44595181/201484828-2bf02dec-2ef2-4f07-b62f-c4c3164906ee.png" width="700"/>
+<img src="https://user-images.githubusercontent.com/44595181/201484828-2bf02dec-2ef2-4f07-b62f-c4c3164906ee.png"/>
