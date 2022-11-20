@@ -12,14 +12,14 @@ resource "aws_vpc" "vpc" {
 ## Subnet
 # public subnet
 resource "aws_subnet" "pub_sub" {
-  count                   = length(var.aws_az)
+  for_each                = var.public_subnet
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = var.public_subnet[count.index]
-  availability_zone       = var.aws_az[count.index]
+  cidr_block              = each.value["cidr"]
+  availability_zone       = each.value["az"]
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "${var.tags}-pub-sub-${var.aws_az_des[count.index]}"
+    Name = "${var.tags}-${each.key}"
   }
 }
 
@@ -32,7 +32,7 @@ resource "aws_subnet" "dev_pri_sub" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "${var.tags}-dev-pri-${each.key}"
+    Name = "${var.tags}-${each.key}"
   }
 }
 
@@ -45,7 +45,7 @@ resource "aws_subnet" "prd_pri_sub" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "${var.tags}-prd-pri-${each.key}"
+    Name = "${var.tags}-${each.key}"
   }
 }
 
@@ -75,45 +75,59 @@ resource "aws_route_table" "pub_rt" {
 
 # pub_rt_association
 resource "aws_route_table_association" "pub_rt_association" {
-  count          = length(aws_route_table.pub_rt)
-  subnet_id      = element(aws_subnet.pub_sub.*.id, count.index)
+  for_each       = var.public_subnet
+  subnet_id      = aws_subnet.pub_sub[each.key].id
   route_table_id = aws_route_table.pub_rt.id
 }
 
 ## EIP
 # nat_eip
 resource "aws_eip" "nat_eip" {
-  count = length(var.aws_az)
-  vpc   = true
+  for_each = var.public_subnet
+  vpc      = true
 
   tags = {
-    Name = "${var.tags}-nat-${var.aws_az_des[count.index]}-eip"
+    Name = "${var.tags}-nat-${each.value["des"]}-eip"
   }
 }
 
 ## Nat gateway
 resource "aws_nat_gateway" "nat_gw" {
-  count         = length(var.aws_az)
-  allocation_id = aws_eip.nat_eip[count.index].id
-  subnet_id     = aws_subnet.pub_sub[count.index].id
+  for_each      = var.public_subnet
+  allocation_id = aws_eip.nat_eip[each.key].id
+  subnet_id     = aws_subnet.pub_sub[each.key].id
 
   tags = {
-    Name = "${var.tags}-nat-${var.aws_az_des[count.index]}"
+    Name = "${var.tags}-nat-${each.value["des"]}"
   }
 }
 
 ## Private Routing table and association
 resource "aws_route_table" "pri_rt" {
-  count      = length(var.aws_az)
+  for_each   = var.public_subnet
   vpc_id     = aws_vpc.vpc.id
   depends_on = [aws_nat_gateway.nat_gw]
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat_gw[count.index].id
+    nat_gateway_id = aws_nat_gateway.nat_gw[each.key].id
   }
 
   tags = {
-    Name = "${var.tags}-pri-rt-${var.aws_az_des[count.index]}"
+    Name = "${var.tags}-pri-rt-${each.value["des"]}"
   }
+}
+
+# dev_rt_association
+resource "aws_route_table_association" "dev_rt_association" {
+  for_each       = var.dev_private_subnet
+  subnet_id      = aws_subnet.dev_pri_sub[each.key].id
+  route_table_id = aws_route_table.pri_rt[each.value["pri_rt"]].id
+}
+
+# prd_rt_association
+resource "aws_route_table_association" "prd_rt_association" {
+  for_each       = var.prd_private_subnet
+  subnet_id      = aws_subnet.prd_pri_sub[each.key].id
+  route_table_id = aws_route_table.pri_rt[each.value["pri_rt"]].id
 }
