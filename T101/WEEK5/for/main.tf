@@ -17,7 +17,7 @@ variable "hero_thousand_faces" {
   type        = map(string)
   default = {
     imok1   = "hero"
-    imok22    = "love interest"
+    imok22  = "love interest"
     imok333 = "mentor"
   }
 }
