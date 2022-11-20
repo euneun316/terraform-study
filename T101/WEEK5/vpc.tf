@@ -25,27 +25,27 @@ resource "aws_subnet" "pub_sub" {
 
 # dev private subnet
 resource "aws_subnet" "dev_pri_sub" {
-  count                   = length(var.aws_az)
+  for_each                = var.dev_private_subnet
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = var.dev_private_subnet[count.index]
-  availability_zone       = var.aws_az[count.index]
+  cidr_block              = each.value["cidr"]
+  availability_zone       = each.value["az"]
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "${var.tags}-dev-pri-sub-${var.aws_az_des[count.index]}"
+    Name = "${var.tags}-dev-pri-${each.key}"
   }
 }
 
 # prd private subnet
 resource "aws_subnet" "prd_pri_sub" {
-  count                   = length(var.aws_az)
+  for_each                = var.prd_private_subnet
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = var.prd_private_subnet[count.index]
-  availability_zone       = var.aws_az[count.index]
+  cidr_block              = each.value["cidr"]
+  availability_zone       = each.value["az"]
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "${var.tags}-prd-pri-sub-${var.aws_az_des[count.index]}"
+    Name = "${var.tags}-prd-pri-${each.key}"
   }
 }
 
@@ -116,18 +116,4 @@ resource "aws_route_table" "pri_rt" {
   tags = {
     Name = "${var.tags}-pri-rt-${var.aws_az_des[count.index]}"
   }
-}
-
-# dev_rt_association
-resource "aws_route_table_association" "dev_rt_association" {
-  count          = length(var.aws_az)
-  subnet_id      = element(aws_subnet.dev_pri_sub.*.id, count.index)
-  route_table_id = element(aws_route_table.pri_rt.*.id, count.index)
-}
-
-# prd_rt_association
-resource "aws_route_table_association" "prd_rt_association" {
-  count          = length(var.aws_az)
-  subnet_id      = element(aws_subnet.prd_pri_sub.*.id, count.index)
-  route_table_id = element(aws_route_table.pri_rt.*.id, count.index)
 }

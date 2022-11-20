@@ -31,13 +31,41 @@ variable "vpc_cidr" {
 }
 
 variable "dev_private_subnet" {
-  type    = list(any)
-  default = ["10.60.0.0/24", "10.60.1.0/24"]
+  type = map(any)
+  default = {
+    sub-2a = {
+      az   = "ap-northeast-2a"
+      cidr = "10.60.0.0/24"
+    }
+    sub-2c = {
+      az   = "ap-northeast-2c"
+      cidr = "10.60.1.0/24"
+    }
+  }
 }
 
+# variable "dev_private_subnet" {
+#   type    = list(any)
+#   default = ["10.60.0.0/24", "10.60.1.0/24"]
+# }
+
+# variable "prd_private_subnet" {
+#   type    = list(any)
+#   default = ["10.60.2.0/24", "10.60.3.0/24"]
+# }
+
 variable "prd_private_subnet" {
-  type    = list(any)
-  default = ["10.60.2.0/24", "10.60.3.0/24"]
+  type = map(any)
+  default = {
+    sub-2a = {
+      az   = "ap-northeast-2a"
+      cidr = "10.60.2.0/24"
+    }
+    sub-2c = {
+      az   = "ap-northeast-2c"
+      cidr = "10.60.3.0/24"
+    }
+  }
 }
 
 variable "public_subnet" {
