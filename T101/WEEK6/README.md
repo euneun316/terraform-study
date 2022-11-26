@@ -139,8 +139,12 @@ aws ec2 describe-instances --query "Reservations[*].Instances[*].{PublicIPAdd:Pu
 ---
 
 ## GitHub Actions as a CI server, with OIDC
-Github Actions 은 직접 자격 증명과 OIDC (Open ID Connect) 지원
-
+Github Actions 은 직접 자격 증명과 OIDC (Open ID Connect) 지원 </br>
+- AWS 공식문서 : </br>
+[Creating OpenID Connect (OIDC) identity providers](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html) </br>
+[Creating a role for web identity or OpenID Connect Federation](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html)</br>
+- GitHub 공식 문서 : </br>
+[Configuring OpenID Connect in Amazon Web Services](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services#updating-your-github-actions-workflow)
 ### OAuth 2.0
 <img src="https://user-images.githubusercontent.com/44595181/204097051-98ca361d-7397-4e32-aaba-ee46ffeb73a9.png" width="700"/>
 
@@ -152,3 +156,83 @@ Github Actions 은 직접 자격 증명과 OIDC (Open ID Connect) 지원
 
 ### GitHub Actions
 
+- **provider URL** : `https://token.actions.githubusercontent.com`
+- **Audience** : `sts.amazonaws.com` if you are using the [official action](https://github.com/aws-actions/configure-aws-credentials)
+
+
+**[Assume a role in AWS]** </br>
+
+IAM Role의 `trust relationships` 을 terraform 으로 작성
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::123456123456:oidc-provider/token.actions.githubusercontent.com"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringLike": {
+                    "token.actions.githubusercontent.com:sub": "repo:GitHubOrg/GitHubRepo:*"
+                },
+                "StringEquals": {
+                    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+                }
+            }
+        }
+    ]
+}
+```
+
+**[GitHub Actions]**
+
+1. **github repo 생성 및 clone** </br>
+```bash
+git clone https://github.com/euneun316/aws-oidc.git
+```
+
+
+2. `.github/workflows/first.yml` 작성 후 push </br>
+   
+first.yml 파일을 푸시(push)하면 GitHub는 해당 워크플로우를 자동으로 즉시 실행함.
+
+```yml
+name: AWS OIDC TEST
+ 
+on: push
+ 
+jobs:
+ build:
+   name: build
+   permissions:
+     id-token: write
+     contents: write
+     
+   runs-on: ubuntu-latest
+   
+   steps:
+     - name: Checkout
+       uses: actions/checkout@v2
+      
+     - name: Configure AWS Credentials
+       uses: aws-actions/configure-aws-credentials@master
+       with:
+         aws-region: ap-northeast-2
+         role-to-assume: arn:aws:iam::[Account ID]:role/github-iam-role-example
+         role-session-name: GithubActionsSession
+    
+     - name: S3 Bucket List
+       run: |
+         aws s3 ls
+
+```
+  
+<img src="https://user-images.githubusercontent.com/44595181/204112819-8c609851-2ce6-4e67-97d5-c81285c988e0.png" width="700"/>
+
+3. **Actions 확인** </br>
+   
+GitHub의 코드 저장소 화면에서 Actions 탭을 클릭하면 워크플로우의 실행 결과를 바로 확인할 수 있음.
+
+<img src="https://user-images.githubusercontent.com/44595181/204112833-5fff35ed-723a-4e60-aa9e-e688746f6f30.png" width="800"/>
