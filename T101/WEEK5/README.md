@@ -4,13 +4,13 @@
 # 반복문 Loops
 테라폼이 제공하는 반복문 구성
 
-- `count` 매개변수 parameter : 리소스와 모듈의 반복
+- `count` **매개변수 parameter** : 리소스와 모듈의 반복
 
-- `for_each` 표현식 expressions : 리소스 내에서 리소스 및 인라인 블록, 모듈을 반복
+- `for_each` **표현식 expressions** : 리소스 내에서 리소스 및 인라인 블록, 모듈을 반복
 
-- `for` 표현식 expressions : 리스트 lists 와 맵 maps 을 반복
+- `for` **표현식 expressions** : 리스트 lists 와 맵 maps 을 반복
 
-- `for 문자열 지시어` string directive : 문자열 내에서 리스트 lists 와 맵 maps 을 반복
+- `for 문자열 지시어` **string directive** : 문자열 내에서 리스트 lists 와 맵 maps 을 반복
 
 ---
 
@@ -40,7 +40,7 @@ aws_iam_user.myiam[2]
 
 ### 배열 조회 구문과 length 함수 사용
 
-**배열 조회 구문** Array lookup syntax : ARRAY[`<INDEX>`]
+**배열 조회 구문** Array lookup syntax : `ARRAY[<INDEX>]`
 - 테라폼에서 count 와 함께 배열 조회 구문과 length 함수를 사용해서 사용자들 생성 가능
 - 리소스에 count 사용한 후에는 하나의 리소스가 아니라 **리소스의 배열**이 됨
 
@@ -153,7 +153,7 @@ resource "<PROVIDER>_<TYPE>" "<NAME>" {
 ### for_each 예제
 for_each 를 사용하여 3명의 IAM 사용자를 생성
 
-`var.user_names` 리스트를 집합(set)으로 변환하기 위해 toset 사용. 
+`var.user_names` 리스트를 집합(set)으로 변환하기 위해 `toset` 사용. 
 
 ```bash
 # main.tf
@@ -283,7 +283,7 @@ upper_names = [
 map을 사용한 for 표현식 : `[for <KEY>, <VALUE> in <MAP> : <OUTPUT>]`
 - MAP : 반복되는 맵
 - KEY, VALUE : MAP의 각 키-값 쌍에 할당할 로컬 변수의 이름
-- OUTPUT : KEY와 VALUE를 어떤 식으로든 변환하는 표현식입니다.
+- OUTPUT : KEY와 VALUE를 어떤 식으로든 변환하는 표현식
 
 ```bash
 #main.tf
@@ -363,7 +363,7 @@ variable "hero_thousand_faces" {
   type        = map(string)
   default = {
     imok1   = "hero"
-    imok22    = "love interest"
+    imok22  = "love interest"
     imok333 = "mentor"
   }
 }
@@ -462,3 +462,19 @@ output "for_directive_index" {
 for_directive = "imok1, imok22, imok33, "
 for_directive_index = "(0) imok1, (1) imok22, (2) imok33, "
 ```
+---
+
+# 조건문 Conditionals
+
+테라폼이 제공하는 **조건문** 구성 conditionals
+
+- `count` **매개 변수 parameter** : 조건부 리소스에서 사용
+
+- `for_each` 와 `for 표현식` **expressions** : 리소스 내의 조건부 리소스 및 인라인 블록에 사용
+
+- `If 문자열 지시자` **if string directive** : 문자열 내의 조건문에 사용
+
+---
+
+## count 매개변수
+count 매개변수를 사용하면 기본 반복문을 수행할 수 있습니다. 이를 응용하여 기본 조건문 작업을 수행할 수 있습니다. 

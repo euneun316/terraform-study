@@ -70,14 +70,20 @@ provider "aws" {
 }
 ```
 
-사용자 환경 변수 사용
-
+1. 사용자 환경 변수 사용
+- 환경 변수 사용 시 코드에 암호가 들어가지 않고, 자격 증명이 디스크가 아닌 메모리에만 저장됨
 ```bash
 $  export AWS_ACCESS_KEY_ID=(YOUR_ACCESS_KEY_ID)
 $  export AWS_SECRET_ACCESS_KEY=(YOUR_SECRET_ACCESS_KEY)
 ```
 
-환경 변수 사용 시 코드에 암호가 들어가지 않고, 자격 증명이 디스크가 아닌 메모리에만 저장됨
+2. aws configure 사용
+```bash
+$ aws configure
+```
+
+3. 내 PC가 아닌 곳에서 임시 보안 자격 증명
+- EC2 instance IAM role, Github Action
 
 ## EC2 Instance running Jenkins as a CI server, with IAM roles 
 EC2에 Jenkins 설치 후 CI서버로 테라폼 코드를 실행한다고 가정
@@ -118,6 +124,7 @@ http://169.254.169.254/latest/meta-data/
 curl -s http://169.254.169.254/latest/meta-data/
 curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials ; echo
 IAMROLE=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials)
+# 임시 보안 자격 증명 IAM role 확인
 curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/$IAMROLE
 
 # EC2 관련 명령 실행 확인
@@ -128,3 +135,20 @@ aws ec2 describe-instances --query "Reservations[*].Instances[*].{PublicIPAdd:Pu
 ```
 
 <img src="https://user-images.githubusercontent.com/44595181/204095543-c77b74d8-40f0-46ad-8ca5-2d32913fa32a.png" width="1100"/>
+
+---
+
+## GitHub Actions as a CI server, with OIDC
+Github Actions 은 직접 자격 증명과 OIDC (Open ID Connect) 지원
+
+### OAuth 2.0
+<img src="https://user-images.githubusercontent.com/44595181/204097051-98ca361d-7397-4e32-aaba-ee46ffeb73a9.png" width="700"/>
+
+1. **User** : 사용자 -> **Resource Owner**
+2. **mine** : 내가 만들 서비스 -> **Client**
+3. **Their** : 사용자가 회원 가입해 있는 곳(구글 페이스북 등) -> 
+   - **Resource Server** : 데이터를 가진 서버
+   - **Authorization Server** : 인증과 관련된 처리를 전담하는 서버 (통상 인증 서버 역할은 R.S 에 통합)
+
+### GitHub Actions
+
