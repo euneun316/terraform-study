@@ -156,6 +156,8 @@ Github Actions 은 직접 자격 증명과 OIDC (Open ID Connect) 지원 </br>
 
 ### GitHub Actions
 
+<img src="https://user-images.githubusercontent.com/44595181/204114088-e1a3c091-3697-4f1e-9be4-4675cc18f4cf.png" width="700"/>
+
 - **provider URL** : `https://token.actions.githubusercontent.com`
 - **Audience** : `sts.amazonaws.com` if you are using the [official action](https://github.com/aws-actions/configure-aws-credentials)
 
