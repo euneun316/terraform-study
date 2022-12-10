@@ -8,6 +8,7 @@
    - 배열의 중간 항목을 제거하면 모든 항목이 1칸씩 앞으로 당겨집니다.
    - 즉 count 사용 시, 목록 중간 항목을 제거하면 테라폼은 해당 항목 뒤에 있는 모든 리소스를 삭제한 다음 해당 리소스를 처음부터 다시 만듭니다.
 
+리소스의 여러 복사본을 만들 때는 count 대신 for_each 를 사용하는 것이 바람직합니다. </br>
 따라서 `for each` 표현식을 사용해 vpc를 생성하는 실습을 진행했습니다.
 
 ## for each 표현식
@@ -27,11 +28,38 @@ resource "<PROVIDER>_<TYPE>" "<NAME>" {
 
 - CONFIG 는 해당 리소스와 관련된 하나 이상의 인수로 구성되는데, CONFIG 내에서 `each.key`또는 `each.value` 를 사용하여 COLLECTION 에서 현재 항목의 키와 값에 접근할 수 있음
 
-## for each 사용방법
+## for each 사용 예시
 
+```bash
+# public subnet
+resource "aws_subnet" "pub_sub" {
+  for_each                = var.public_subnet
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = each.value["cidr"]
+  availability_zone       = each.value["az"]
+  map_public_ip_on_launch = false
 
+  tags = {
+    Name = "${var.tags}-${each.key}"
+  }
+}
+```
 
+맵에서 값만 반환하는 내장 함수 `values` 사용 가능
+
+```bash
+output "pub_sub_ids" {
+  value = aws_subnet.pub_sub.*
+}
+
+output "dev_pri_sub_ids" {
+  value = values(aws_subnet.dev_pri_sub)[*].id
+}
+
+```
 ### terraform outputs
+
+for_each 를 사용한 후에는 하나의 리소스 또는 count 를 사용한 것과 같은 **리소스 배열이 되는 것이 아니리** 리소스 맵 `list into a set` 이 됩니다.
 
 ```bash
 Outputs:
@@ -40,17 +68,29 @@ dev_pri_sub_ids = [
   "subnet-0457a9a5e265772e4",
   "subnet-08b233055afe17048",
 ]
-nat_eip = [
-  "43.200.34.16",
-  "3.35.39.19",
-]
-prd_pri_sub_ids = [
-  "subnet-025244867624bfb54",
-  "subnet-00d8a1690def90728",
-]
 pub_sub_ids = [
-  "subnet-0287225ab470dae20",
-  "subnet-0f0a1ba4b942b6da5",
+  {
+    pub-sub-2a = {
+      "availability_zone" = "ap-northeast-2a"
+      "availability_zone_id" = "apne2-az1"
+      "cidr_block" = "10.60.4.0/24"
+      "id" = "subnet-0caaebfec80d80359"
+      "tags" = tomap({
+        "Name" = "T101-pub-sub-2a"
+      })
+      "vpc_id" = "vpc-0473c85bd926f6873"
+    },
+    pub-sub-2c = {
+      "availability_zone" = "ap-northeast-2c"
+      "availability_zone_id" = "apne2-az3"
+      "cidr_block" = "10.60.5.0/24"
+      "id" = "subnet-0aaaf57e88b761897"
+      "tags" = tomap({
+        "Name" = "T101-pub-sub-2c"
+      })
+      "vpc_id" = "vpc-0473c85bd926f6873"
+    },
+  }
 ]
-vpc_id = "vpc-0ac668c2eb60832e0"
+
 ```
