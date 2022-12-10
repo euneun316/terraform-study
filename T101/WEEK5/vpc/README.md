@@ -59,7 +59,7 @@ output "dev_pri_sub_ids" {
 ```
 ### terraform outputs
 
-for_each 를 사용한 후에는 하나의 리소스 또는 count 를 사용한 것과 같은 **리소스 배열이 되는 것이 아니리** 리소스 맵 `list into a set` 이 됩니다.
+for_each 를 사용한 후에는 하나의 리소스 또는 count 를 사용한 것과 같은 **리소스 배열이 되는 것이 아니라** 리소스 맵 `list into a set` 이 됩니다.
 
 ```bash
 Outputs:
