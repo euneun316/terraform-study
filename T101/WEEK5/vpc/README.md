@@ -1,0 +1,56 @@
+# for_each 활용해 vpc 생성하기
+
+`count` 매개변수 사용 시 아래와 같은 제약사항이 있습니다.
+
+1. **인라인 블록에 `count` 사용 지원하지 않음**
+   - 전체 리소스를 반복할 수는 있지만 리소스 내에서 인라인 블록을 반복할 때, count 사용은 지원하지 않습니다.
+2. **수정 시 발생하는 에러**
+   - 배열의 중간 항목을 제거하면 모든 항목이 1칸씩 앞으로 당겨집니다.
+   - 즉 count 사용 시, 목록 중간 항목을 제거하면 테라폼은 해당 항목 뒤에 있는 모든 리소스를 삭제한 다음 해당 리소스를 처음부터 다시 만듭니다.
+
+따라서 `for each` 표현식을 사용해 vpc를 생성하는 실습을 진행했습니다.
+
+## for each 표현식
+[for_each 공식문서](https://developer.hashicorp.com/terraform/language/meta-arguments/for_each)
+
+for_each 표현식을 사용하면 `리스트 lists`, `집합 sets`, `맵 maps` 를 사용하여 전체 리소스의 여러 복사본 또는 리소스 내 인라인 블록의 여러 복사본, 모듈의 복사본을 생성 할 수 있습니다.
+
+```bash
+resource "<PROVIDER>_<TYPE>" "<NAME>" {
+  for_each = <COLLECTION>
+
+  [CONFIG ...]
+}
+```
+- **COLLECTION** 은 루프를 처리할 집합 또는 맵
+- **리소스에 for_each 를 사용할 때, 리스트는 지원 안함**
+
+- CONFIG 는 해당 리소스와 관련된 하나 이상의 인수로 구성되는데, CONFIG 내에서 `each.key`또는 `each.value` 를 사용하여 COLLECTION 에서 현재 항목의 키와 값에 접근할 수 있음
+
+## for each 사용방법
+
+
+
+### terraform outputs
+
+```bash
+Outputs:
+
+dev_pri_sub_ids = [
+  "subnet-0457a9a5e265772e4",
+  "subnet-08b233055afe17048",
+]
+nat_eip = [
+  "43.200.34.16",
+  "3.35.39.19",
+]
+prd_pri_sub_ids = [
+  "subnet-025244867624bfb54",
+  "subnet-00d8a1690def90728",
+]
+pub_sub_ids = [
+  "subnet-0287225ab470dae20",
+  "subnet-0f0a1ba4b942b6da5",
+]
+vpc_id = "vpc-0ac668c2eb60832e0"
+```
