@@ -1,0 +1,38 @@
+# Default Terraform module 구조
+
+1. **root module** : 실제로 수행하게 되는 작업 디렉터리의 terraform 코드 모음 , `root.tf`
+2. **child module** : root module에서 리소스를 생성하기 위해 참조하고 있는 module block
+
+```
+.
+├── ec2
+│   ├── ami.tf
+│   ├── key-pair.tf
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── user_data
+│   │   ├── user_data_private.sh
+│   │   └── user_data_public.sh
+│   └── variables.tf
+├── iam
+│   ├── main.tf
+│   ├── outputs.tf
+│   └── variables.tf
+├── outputs.tf
+├── provider.tf
+├── root.tf
+├── sg
+│   ├── main.tf
+│   ├── outputs.tf
+│   └── variables.tf
+├── terraform.tfstate.d
+│   └── imok
+│       ├── terraform.tfstate
+│       └── terraform.tfstate.backup
+├── terraform.tfvars
+├── variables.tf
+└── vpc
+    ├── main.tf
+    ├── outputs.tf
+    └── variables.tf
+```
