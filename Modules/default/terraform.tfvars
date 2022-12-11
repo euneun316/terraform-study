@@ -75,16 +75,16 @@ public_ingress_rules = [
 
 private_ingress_rules = [
   {
-    from_port = "22",
-    to_port   = "22",
+    from_port = "25",
+    to_port   = "25",
     cidr      = "151.149.23.124/32"
-    desc      = "From Imok SSH(random test ip)"
+    desc      = "From Imok SMTP(random test ip)"
   },
   {
-    from_port = "3389",
-    to_port   = "3389",
+    from_port = "80",
+    to_port   = "80",
     cidr      = "151.149.23.124/32"
-    desc      = "From Imok RDP(random test ip)"
+    desc      = "From Imok HTTP(random test ip)"
   }
 ]
 
