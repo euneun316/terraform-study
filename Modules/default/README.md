@@ -5,6 +5,10 @@
 2. **child module** : root module에서 리소스를 생성하기 위해 참조하고 있는 module block
 	- `EC2`, `VPC`, `IAM`, `SG`
 
+</br>
+
+<img src="https://user-images.githubusercontent.com/44595181/208888036-1ebca3e8-d6df-464a-88b5-bb90f981c485.png">
+
 ```
 .
 ├── ec2
